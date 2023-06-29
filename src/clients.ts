@@ -7,7 +7,7 @@ import assert from "node:assert";
 const {
   AWS_REGION,
   AWS_DEFAULT_REGION,
-
+  CLOUDWATCH_ENDPOINT,
   DYNAMODB_ENDPOINT,
   S3_ENDPOINT,
   SQS_ENDPOINT,
@@ -35,4 +35,5 @@ export const dynamodb = new DynamoDBClient({
 
 export const cloudwatch = new CloudWatchClient({
   region: AWS_REGION || AWS_DEFAULT_REGION,
+  endpoint: CLOUDWATCH_ENDPOINT,
 });

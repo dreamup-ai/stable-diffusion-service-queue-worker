@@ -9,6 +9,7 @@ const {
   SALAD_API_KEY,
   JOB_TABLE,
   USER_CONTENT_BUCKET,
+  NUM_WORKERS = "1",
 } = process.env;
 
 assert(QUEUE_URL, "QUEUE_URL must be set");
@@ -20,6 +21,7 @@ assert(JOB_TABLE, "JOB_TABLE must be set");
 assert(USER_CONTENT_BUCKET, "USER_CONTENT_BUCKET must be set");
 
 const baseUrl = new URL(STABLE_DIFFUSION_SERVICE_URL);
+const numWorkers = parseInt(NUM_WORKERS, 10);
 
 export let stayAlive = true;
 export const setStayAlive = (value: boolean) => {
@@ -34,7 +36,7 @@ async function main() {
     const { Messages } = await sqsClient.send(
       new ReceiveMessageCommand({
         QueueUrl: QUEUE_URL,
-        MaxNumberOfMessages: 10,
+        MaxNumberOfMessages: numWorkers,
         WaitTimeSeconds: 20,
       })
     );
@@ -105,14 +107,7 @@ async function main() {
             return setJobStatus(job.id, "failed", ReceiptHandle);
           }
 
-          const {
-            image,
-            seed,
-            nsfw,
-            gpu_duration,
-            scheduler_name,
-            request_duration,
-          } = response;
+          const { image, seed, nsfw, gpu_duration } = response;
 
           if (!image) {
             return setJobStatus(job.id, "failed", ReceiptHandle);
