@@ -91,7 +91,7 @@ async function main() {
           const result = await fetch(url.toString(), reqInfo);
           if (!result.ok) {
             console.error(job.id, result);
-            console.log(await result.text());
+
             return setJobStatus(job.id, "failed", ReceiptHandle);
           }
 

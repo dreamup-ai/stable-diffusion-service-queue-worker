@@ -99,6 +99,7 @@ export async function getCachedImageViaQueue(url: string): Promise<Buffer> {
     QueueUrl: await getImageCacheQueueUrl(),
     MessageBody: JSON.stringify({ url }),
     MessageGroupId: uuidv4(),
+    MessageDeduplicationId: uuidv4(),
   });
   await sqsClient.send(msgCmd);
 

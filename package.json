@@ -1,12 +1,15 @@
 {
   "name": "stable-diffusion-service-queue-worker",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "This is a queue-worker sidecar container for the stable diffusion service",
   "main": "dist/src/index.js",
   "scripts": {
     "test": "npm run build && mocha --require dist/test/env.js --recursive dist/test",
     "build": "tsc",
-    "start": "node dist/src/index.js"
+    "start": "node dist/src/index.js",
+    "aws-services": "docker compose up dynamodb-local localstack",
+    "docker-start": "docker compose up stable-diffusion-server-queue-worker",
+    "init-aws": "node dist/seed-local-aws.js"
   },
   "author": "Shawn Rushefsky",
   "license": "MIT",
