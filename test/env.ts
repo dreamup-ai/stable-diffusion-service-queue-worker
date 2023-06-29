@@ -1,0 +1,20 @@
+Object.assign(process.env, {
+  DYNAMODB_ENDPOINT: "http://localhost:8000",
+  S3_ENDPOINT: "http://localhost:4566",
+  SQS_ENDPOINT: "http://localhost:4566",
+  CLOUDWATCH_ENDPOINT: "http://localhost:4566",
+  STABLE_DIFFUSION_SERVICE_URL: "https://big-blackberry-spinach.salad.cloud",
+  QUEUE_URL:
+    "http://localhost:4566/000000000000/stable-diffusion-server-jobs.fifo",
+  JOB_TABLE: "test-table",
+  AWS_DEFAULT_REGION: "us-east-1",
+  AWS_ACCESS_KEY_ID: "test",
+  AWS_SECRET_ACCESS_KEY: "test",
+  IMAGE_CACHE_BUCKET: "dreamup-web-image-cache",
+  IMAGE_CACHE_TABLE: "web-image-cache",
+  USER_CONTENT_BUCKET: "dreamup-user-content",
+  PUBLIC_STATS_TABLE: "public-stats",
+  IMAGE_COUNT_KEY: "images_generated_count",
+  IMAGE_CACHE_QUEUE: "web-image-caching-jobs.fifo",
+  ACTIVE_USER_TABLE: "dreamup-active-users",
+});

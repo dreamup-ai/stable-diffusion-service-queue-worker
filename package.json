@@ -4,7 +4,7 @@
   "description": "This is a queue-worker sidecar container for the stable diffusion service",
   "main": "dist/src/index.js",
   "scripts": {
-    "test": "mocha --recursive dist/test",
+    "test": "npm run build && mocha --require dist/test/env.js --recursive dist/test",
     "build": "tsc",
     "start": "node dist/src/index.js"
   },

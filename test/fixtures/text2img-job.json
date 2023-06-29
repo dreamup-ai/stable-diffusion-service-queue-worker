@@ -1,0 +1,17 @@
+{
+  "id": "easytofind111",
+  "user_id": "21cda033-42e4-43bf-b713-531b2e3e99d6",
+  "model": "Lykon/DreamShaper",
+  "pipeline": "text2img",
+  "output_key": "generated.png",
+  "params": {
+    "prompt": "A picture of a cat",
+    "negative_prompt": "ugly",
+    "seed": 42,
+    "num_inference_steps": 20,
+    "guidance_scale": 7.5,
+    "width": 512,
+    "height": 512,
+    "scheduler": "DDIMScheduler"
+  }
+}

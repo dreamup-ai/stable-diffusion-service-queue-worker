@@ -80,7 +80,7 @@ async function main() {
           const reqInfo = {
             method: "POST",
             headers: {
-              "Content-Type": "application/octet-stream",
+              "Content-Type": "application/json",
             } as any,
             body: JSON.stringify(job),
           };
@@ -91,6 +91,7 @@ async function main() {
           const result = await fetch(url.toString(), reqInfo);
           if (!result.ok) {
             console.error(job.id, result);
+            console.log(await result.text());
             return setJobStatus(job.id, "failed", ReceiptHandle);
           }
 
@@ -117,7 +118,7 @@ async function main() {
             await uploadImageToS3(
               USER_CONTENT_BUCKET as string,
               job.output_key,
-              image
+              Buffer.from(image, "base64")
             );
           } catch (e: any) {
             console.error(job.id, e);

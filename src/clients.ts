@@ -26,6 +26,7 @@ export const sqs = new SQSClient({
 export const s3 = new S3Client({
   region: AWS_REGION || AWS_DEFAULT_REGION,
   endpoint: S3_ENDPOINT,
+  forcePathStyle: true,
 });
 
 export const dynamodb = new DynamoDBClient({

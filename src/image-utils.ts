@@ -1,6 +1,6 @@
 import { GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { SendMessageCommand } from "@aws-sdk/client-sqs";
+import { GetQueueUrlCommand, SendMessageCommand } from "@aws-sdk/client-sqs";
 import assert from "node:assert";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -27,6 +27,22 @@ const cacheFetchMaxRetries = parseInt(CACHE_FETCH_MAX_RETRIES);
 const cacheFetchRetryDelay = parseInt(CACHE_FETCH_RETRY_DELAY);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let imageCacheQueueUrl: string | undefined;
+export async function getImageCacheQueueUrl(): Promise<string> {
+  if (!imageCacheQueueUrl) {
+    const { QueueUrl } = await sqsClient.send(
+      new GetQueueUrlCommand({
+        QueueName: IMAGE_CACHE_QUEUE,
+      })
+    );
+    if (!QueueUrl) {
+      throw new Error("Failed to get image cache queue URL");
+    }
+    imageCacheQueueUrl = QueueUrl;
+  }
+  return imageCacheQueueUrl;
+}
 
 export async function getImageFromS3(
   bucket: string,
@@ -80,7 +96,7 @@ export async function uploadImageToS3(
 
 export async function getCachedImageViaQueue(url: string): Promise<Buffer> {
   const msgCmd = new SendMessageCommand({
-    QueueUrl: IMAGE_CACHE_QUEUE,
+    QueueUrl: await getImageCacheQueueUrl(),
     MessageBody: JSON.stringify({ url }),
     MessageGroupId: uuidv4(),
   });
