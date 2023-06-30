@@ -2,7 +2,7 @@ import { ReceiveMessageCommand } from "@aws-sdk/client-sqs";
 import assert from "node:assert";
 import { sqs as sqsClient } from "./clients";
 import { getCachedImageViaQueue, uploadImageToS3 } from "./image-utils";
-import { decrementUserJobCount, setJobStatus } from "./job-utils";
+import { setJobStatus } from "./job-utils";
 const {
   QUEUE_URL,
   STABLE_DIFFUSION_SERVICE_URL,
@@ -90,7 +90,7 @@ async function main() {
           console.log("Sending request to", url.toString());
           const result = await fetch(url.toString(), reqInfo);
           if (!result.ok) {
-            console.error(job.id, result);
+            console.error(job.id, await result.text());
 
             return setJobStatus(job.id, "failed", ReceiptHandle);
           }
@@ -139,7 +139,6 @@ async function main() {
               seed,
               job.output_key
             ),
-            decrementUserJobCount(job.user_id),
           ]);
         })
       );

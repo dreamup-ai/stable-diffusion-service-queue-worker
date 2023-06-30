@@ -12,7 +12,7 @@ assert(USER_CONTENT_BUCKET, "USER_CONTENT_BUCKET must be set");
 assert(ACTIVE_USER_TABLE, "ACTIVE_USER_TABLE must be set");
 
 export const setJobStatus = async (
-  jobId: string,
+  job: any,
   status: string,
   receiptHandle: string | undefined = undefined,
   job_time: number | undefined = undefined,
@@ -21,6 +21,7 @@ export const setJobStatus = async (
   seed: number | undefined = undefined,
   output_key: string | undefined = undefined
 ) => {
+  const jobId = job.id;
   console.log(`Setting job ${jobId} status to ${status}`);
   // We are going to add a timestamp to the job status
   // so we can see how long it took to process the job
@@ -81,10 +82,14 @@ export const setJobStatus = async (
     params.ExpressionAttributeValues[":output_key"] = { S: output_key };
     promises.push(
       incrementImagesGeneratedCount(),
-      emitStatusMetric("stable-diffusion.completed")
+      emitStatusMetric("stable-diffusion.completed"),
+      decrementUserJobCount(job.user_id)
     );
   } else if (status === "failed") {
-    promises.push(emitStatusMetric("stable-diffusion.failed"));
+    promises.push(
+      emitStatusMetric("stable-diffusion.failed"),
+      decrementUserJobCount(job.user_id)
+    );
   }
 
   if (receiptHandle) {

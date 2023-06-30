@@ -1,6 +1,6 @@
 {
   "name": "stable-diffusion-service-queue-worker",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "This is a queue-worker sidecar container for the stable diffusion service",
   "main": "dist/src/index.js",
   "scripts": {

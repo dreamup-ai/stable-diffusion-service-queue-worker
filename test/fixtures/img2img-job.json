@@ -1,7 +1,7 @@
 {
-  "id": "easytofind111",
+  "id": "easytofind-img2img1",
   "user_id": "21cda033-42e4-43bf-b713-531b2e3e99d6",
-  "model": "Lykon/DreamShaper",
+  "model": "nitrosocke/Nitro-Diffusion",
   "pipeline": "img2img",
   "output_key": "generated.png",
   "params": {
@@ -11,6 +11,6 @@
     "num_inference_steps": 20,
     "guidance_scale": 7.5,
     "scheduler": "DDIMScheduler",
-    "image": "https://example.com/original.png"
+    "image": "https://app.dreamup.ai/content/21cda033-42e4-43bf-b713-531b2e3e99d6/fadbc3f4-e52a-4da1-8c1f-4a7c88f2c775.png"
   }
 }
