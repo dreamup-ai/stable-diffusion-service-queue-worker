@@ -2,15 +2,16 @@
   "id": "easytofind111",
   "user_id": "21cda033-42e4-43bf-b713-531b2e3e99d6",
   "model": "Lykon/DreamShaper",
-  "pipeline": "img2img",
+  "pipeline": "controlnet",
   "output_key": "generated.png",
   "params": {
-    "prompt": "A picture of a cat",
+    "prompt": "detailed portrait of a Samurai warrior",
     "negative_prompt": "ugly",
     "seed": 42,
     "num_inference_steps": 20,
     "guidance_scale": 7.5,
     "scheduler": "DDIMScheduler",
-    "image": "https://example.com/original.png"
+    "image": "https://example.com/openpose.png",
+    "control_model": "openpose"
   }
 }

@@ -131,3 +131,7 @@ dist
 
 .pythagora
 volume
+
+test/fixtures/text2img.png
+test/fixtures/img2img.png
+test/fixtures/controlnet.png
