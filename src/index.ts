@@ -130,7 +130,7 @@ async function main() {
 
           await Promise.all([
             setJobStatus(
-              job.id,
+              job,
               "completed",
               ReceiptHandle,
               jobTime,
