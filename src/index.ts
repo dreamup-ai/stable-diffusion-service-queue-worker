@@ -51,7 +51,7 @@ async function main() {
           const job = JSON.parse(Body);
 
           console.log(`Processing job ${job.id}`);
-          setJobStatus(job.id, "running");
+          setJobStatus(job, "running");
           const url = new URL(`/image`, baseUrl);
 
           if (job.params.image) {
@@ -60,7 +60,7 @@ async function main() {
               job.params.image = img.toString("base64");
             } catch (e: any) {
               console.error(job.id, e);
-              return setJobStatus(job.id, "failed", ReceiptHandle);
+              return setJobStatus(job, "failed", ReceiptHandle);
             }
           }
 
@@ -70,7 +70,7 @@ async function main() {
               job.params.mask_image = img.toString("base64");
             } catch (e: any) {
               console.error(job.id, e);
-              return setJobStatus(job.id, "failed", ReceiptHandle);
+              return setJobStatus(job, "failed", ReceiptHandle);
             }
           }
 
@@ -92,7 +92,7 @@ async function main() {
           if (!result.ok) {
             console.error(job.id, await result.text());
 
-            return setJobStatus(job.id, "failed", ReceiptHandle);
+            return setJobStatus(job, "failed", ReceiptHandle);
           }
 
           let response: any;
@@ -100,18 +100,18 @@ async function main() {
             const resultJson = await result.json();
             if (resultJson.error) {
               console.error(job.id, resultJson.error);
-              return setJobStatus(job.id, "failed", ReceiptHandle);
+              return setJobStatus(job, "failed", ReceiptHandle);
             }
             response = resultJson;
           } catch (e: any) {
             console.error(job.id, e);
-            return setJobStatus(job.id, "failed", ReceiptHandle);
+            return setJobStatus(job, "failed", ReceiptHandle);
           }
 
           const { image, seed, nsfw, gpu_duration } = response;
 
           if (!image) {
-            return setJobStatus(job.id, "failed", ReceiptHandle);
+            return setJobStatus(job, "failed", ReceiptHandle);
           }
 
           try {
@@ -122,7 +122,7 @@ async function main() {
             );
           } catch (e: any) {
             console.error(job.id, e);
-            return setJobStatus(job.id, "failed", ReceiptHandle);
+            return setJobStatus(job, "failed", ReceiptHandle);
           }
 
           const timeCompleted = Date.now();
