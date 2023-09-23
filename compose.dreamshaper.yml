@@ -1,6 +1,6 @@
 services:
   stable-diffusion-service:
-    image: public.ecr.aws/i0t3i1w9/stable-diffusion-service-queue-worker:0.1.3-dreamshaper
+    image: public.ecr.aws/i0t3i1w9/stable-diffusion-service-queue-worker:0.2.0-dreamshaper
     # runtime: nvidia
     network_mode: host
     # build:

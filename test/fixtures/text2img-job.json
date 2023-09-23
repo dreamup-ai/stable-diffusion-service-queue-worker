@@ -1,7 +1,7 @@
 {
   "id": "easytofind-text2img",
   "user_id": "21cda033-42e4-43bf-b713-531b2e3e99d6",
-  "model": "nitrosocke/Nitro-Diffusion",
+  "model": "Lykon/DreamShaper",
   "pipeline": "text2img",
   "output_key": "generated.png",
   "params": {
