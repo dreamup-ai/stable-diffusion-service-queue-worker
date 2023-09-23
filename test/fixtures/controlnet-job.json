@@ -11,7 +11,7 @@
     "num_inference_steps": 20,
     "guidance_scale": 7.5,
     "scheduler": "DDIMScheduler",
-    "image": "https://example.com/openpose.png",
+    "image": "https://app.dreamup.ai/content/21cda033-42e4-43bf-b713-531b2e3e99d6/7c8e9f40-f0db-4db5-9c61-95888c44f4c0/openpose_face.webp",
     "control_model": "openpose"
   }
 }
