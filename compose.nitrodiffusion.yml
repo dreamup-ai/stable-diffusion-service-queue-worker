@@ -1,0 +1,27 @@
+services:
+  stable-diffusion-service:
+    image: public.ecr.aws/i0t3i1w9/stable-diffusion-service-queue-worker:0.2.0-nitro-diffusion
+    # runtime: nvidia
+    network_mode: host
+    # build:
+    #   context: ./
+    #   dockerfile: Dockerfile.base
+    environment:
+      JOB_TABLE: dreamup-jobs
+      AWS_DEFAULT_REGION: us-east-1
+      IMAGE_CACHE_BUCKET: dreamup-web-image-cache
+      IMAGE_CACHE_TABLE: web-image-cache
+      USER_CONTENT_BUCKET: dreamup-user-content
+      PUBLIC_STATS_TABLE: public-stats
+      IMAGE_COUNT_KEY: images_generated_count
+      IMAGE_CACHE_QUEUE: web-image-caching-jobs.fifo
+      ACTIVE_USER_TABLE: dreamup-active-users
+      QUEUE_URL: https://sqs.us-east-1.amazonaws.com/045411470840/model_nitrosocke_nitro-diffusion-beta.fifo
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
