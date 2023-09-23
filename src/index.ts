@@ -31,7 +31,44 @@ process.on("SIGINT", () => {
   stayAlive = false;
 });
 
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const maxRetries = 300;
+const waitForServerToStart = async () => {
+  let retries = 0;
+  while (retries < maxRetries) {
+    retries++;
+    try {
+      const url = new URL(`/hc`, baseUrl);
+      const reqInfo = {
+        method: "GET",
+        headers: {} as any,
+      };
+      if (SALAD_API_KEY) {
+        reqInfo.headers["Salad-Api-Key"] = SALAD_API_KEY;
+      }
+      console.log(
+        `(${retries}/${maxRetries})Checking if server is up at ${url.toString()}`
+      );
+
+      const result = await fetch(url.toString(), reqInfo);
+
+      if (result.ok) {
+        return;
+      }
+    } catch (e) {
+      await sleep(1000);
+    }
+
+    await sleep(1000);
+  }
+  throw new Error(`Server did not start after ${maxRetries} retries`);
+};
+
 async function main() {
+  await waitForServerToStart();
   while (stayAlive) {
     const { Messages } = await sqsClient.send(
       new ReceiveMessageCommand({
