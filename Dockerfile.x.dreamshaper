@@ -1,0 +1,26 @@
+FROM node:18-alpine as builder
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY src ./src
+COPY tsconfig.json ./
+
+RUN npm run build
+
+# Build the benchmark worker into a standalone binary with pkg.
+# This way we don't have to set up a node environment in the inference image.
+RUN npx pkg -t node18-linux-x64 --out-path ./bin .
+
+FROM public.ecr.aws/i0t3i1w9/stable-diffusion-server:0.1.4-lykon-dreamshaper-controlnet-slim
+
+COPY --from=builder /app/bin/qworker ./qworker
+
+ENV HOST=127.0.0.1
+ENV PORT=1111
+ENV STABLE_DIFFUSION_SERVICE_URL="http://${HOST}:${PORT}"
+
+CMD ["/bin/bash", "-c", "python server/app.py & ./qworker"]
