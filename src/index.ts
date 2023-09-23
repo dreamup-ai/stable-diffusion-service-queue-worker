@@ -3,6 +3,7 @@ import assert from "node:assert";
 import { sqs as sqsClient } from "./clients";
 import { getCachedImageViaQueue, uploadImageToS3 } from "./image-utils";
 import { setJobStatus } from "./job-utils";
+import { JobFromQueue } from "./types";
 const {
   QUEUE_URL,
   STABLE_DIFFUSION_SERVICE_URL,
@@ -85,30 +86,47 @@ async function main() {
 
           const timeStarted = Date.now();
 
-          const job = JSON.parse(Body);
+          const job = JSON.parse(Body) as JobFromQueue;
 
           console.log(`Processing job ${job.id}`);
-          setJobStatus(job, "running");
+          setJobStatus({ job, status: "running" });
           const url = new URL(`/image`, baseUrl);
 
+          const imagesToFetch = [];
+
           if (job.params.image) {
-            try {
-              const img = await getCachedImageViaQueue(job.params.image);
-              job.params.image = img.toString("base64");
-            } catch (e: any) {
-              console.error(job.id, e);
-              return setJobStatus(job, "failed", ReceiptHandle);
-            }
+            imagesToFetch.push(
+              getCachedImageViaQueue(job.params.image).then((img) => {
+                job.params.image = img.toString("base64");
+              })
+            );
           }
 
           if (job.params.mask_image) {
-            try {
-              const img = await getCachedImageViaQueue(job.params.mask_image);
-              job.params.mask_image = img.toString("base64");
-            } catch (e: any) {
-              console.error(job.id, e);
-              return setJobStatus(job, "failed", ReceiptHandle);
-            }
+            imagesToFetch.push(
+              getCachedImageViaQueue(job.params.mask_image).then((img) => {
+                job.params.mask_image = img.toString("base64");
+              })
+            );
+          }
+
+          if (job.params.control_image) {
+            imagesToFetch.push(
+              getCachedImageViaQueue(job.params.control_image).then((img) => {
+                job.params.control_image = img.toString("base64");
+              })
+            );
+          }
+
+          try {
+            await Promise.all(imagesToFetch);
+          } catch (e: any) {
+            console.error(job.id, e);
+            return setJobStatus({
+              job,
+              status: "failed",
+              receiptHandle: ReceiptHandle,
+            });
           }
 
           /**
@@ -129,7 +147,11 @@ async function main() {
           if (!result.ok) {
             console.error(job.id, await result.text());
             console.error(reqInfo);
-            return setJobStatus(job, "failed", ReceiptHandle);
+            return setJobStatus({
+              job,
+              status: "failed",
+              receiptHandle: ReceiptHandle,
+            });
           }
 
           let response: any;
@@ -137,18 +159,30 @@ async function main() {
             const resultJson = await result.json();
             if (resultJson.error) {
               console.error(job.id, resultJson.error);
-              return setJobStatus(job, "failed", ReceiptHandle);
+              return setJobStatus({
+                job,
+                status: "failed",
+                receiptHandle: ReceiptHandle,
+              });
             }
             response = resultJson;
           } catch (e: any) {
             console.error(job.id, e);
-            return setJobStatus(job, "failed", ReceiptHandle);
+            return setJobStatus({
+              job,
+              status: "failed",
+              receiptHandle: ReceiptHandle,
+            });
           }
 
           const { image, seed, nsfw, gpu_duration } = response;
 
           if (!image) {
-            return setJobStatus(job, "failed", ReceiptHandle);
+            return setJobStatus({
+              job,
+              status: "failed",
+              receiptHandle: ReceiptHandle,
+            });
           }
 
           try {
@@ -159,23 +193,27 @@ async function main() {
             );
           } catch (e: any) {
             console.error(job.id, e);
-            return setJobStatus(job, "failed", ReceiptHandle);
+            return setJobStatus({
+              job,
+              status: "failed",
+              receiptHandle: ReceiptHandle,
+            });
           }
 
           const timeCompleted = Date.now();
           const jobTime = (timeCompleted - timeStarted) / 1000;
 
           await Promise.all([
-            setJobStatus(
+            setJobStatus({
               job,
-              "completed",
-              ReceiptHandle,
-              jobTime,
-              gpu_duration,
-              nsfw,
+              status: "completed",
+              receiptHandle: ReceiptHandle,
+              job_time: jobTime,
+              gpu_time: gpu_duration,
+              is_nsfw: nsfw,
               seed,
-              job.output_key
-            ),
+              output_key: job.output_key,
+            }),
           ]);
         })
       );

@@ -3,6 +3,7 @@ import { DeleteMessageCommand } from "@aws-sdk/client-sqs";
 import assert from "node:assert";
 import { dynamodb as dynamoClient, sqs as sqsClient } from "./clients";
 import { emitStatusMetric, incrementImagesGeneratedCount } from "./metrics";
+import { JobStatusUpdate } from "./types";
 
 const { JOB_TABLE, QUEUE_URL, USER_CONTENT_BUCKET, ACTIVE_USER_TABLE } =
   process.env;
@@ -11,16 +12,17 @@ assert(QUEUE_URL, "QUEUE_URL must be set");
 assert(USER_CONTENT_BUCKET, "USER_CONTENT_BUCKET must be set");
 assert(ACTIVE_USER_TABLE, "ACTIVE_USER_TABLE must be set");
 
-export const setJobStatus = async (
-  job: any,
-  status: string,
-  receiptHandle: string | undefined = undefined,
-  job_time: number | undefined = undefined,
-  gpu_time: number | undefined = undefined,
-  is_nsfw: boolean | undefined = undefined,
-  seed: number | undefined = undefined,
-  output_key: string | undefined = undefined
-) => {
+export const setJobStatus = async (jobStatusUpdate: JobStatusUpdate) => {
+  const {
+    job,
+    status,
+    receiptHandle,
+    job_time,
+    gpu_time,
+    is_nsfw,
+    seed,
+    output_key,
+  } = jobStatusUpdate;
   const jobId = job.id;
   console.log(`Setting job ${jobId} status to ${status}`);
   // We are going to add a timestamp to the job status
